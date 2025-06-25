@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const userInput = document.getElementById('user-input');
     const sendButton = document.getElementById('send-button');
     const typingIndicator = document.getElementById('typing-indicator');
-    const personalitySelect = document.getElementById('personality-select'); // <-- NEW: Get dropdown element
+    const personalitySelect = document.getElementById('personality-select');
+    const initialGreeting = document.getElementById('initial-greeting'); // Get the new greeting element
 
     // Event listeners for sending messages
     sendButton.addEventListener('click', sendMessage);
@@ -39,6 +40,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
+     * Hides the initial "Hello" greeting message.
+     */
+    function removeInitialGreeting() {
+        if (initialGreeting && !initialGreeting.classList.contains('hidden')) {
+            initialGreeting.classList.add('hidden');
+            // Optional: Remove the element after transition to clean up DOM
+            initialGreeting.addEventListener('transitionend', () => {
+                initialGreeting.remove();
+            }, { once: true });
+        }
+    }
+
+    /**
      * Converts text to speech using the Web Speech API.
      * @param {string} text The text to be spoken.
      */
@@ -58,9 +72,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function sendMessage() {
         const message = userInput.value.trim();
-        const selectedPersonality = personalitySelect.value; // <-- NEW: Get selected personality value
+        const selectedPersonality = personalitySelect.value;
 
         if (message === '') return;
+
+        // Hide the initial greeting message when the first user message is sent
+        removeInitialGreeting();
 
         addMessage('user', message);
         userInput.value = '';
@@ -76,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     message: message,
-                    personality: selectedPersonality // <-- NEW: Send personality to backend
+                    personality: selectedPersonality
                 })
             });
 

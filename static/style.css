@@ -124,6 +124,9 @@ body {
     /* Custom scrollbar styles (for browsers that support it) */
     scrollbar-width: thin; /* Firefox */
     scrollbar-color: var(--border-color) var(--chat-bg-color); /* Firefox */
+
+    /* IMPORTANT: Remove centering from chat-box */
+    display: block; /* Change back to default block display for stacking messages */
 }
 
 /* Custom scrollbar for Webkit browsers (Chrome, Safari, Edge) */
@@ -141,6 +144,47 @@ body {
     border: 2px solid var(--chat-bg-color);
 }
 
+/* --- Initial Greeting Message Styles --- */
+.initial-greeting-message {
+    /* Adjusted font size for the primary greeting */
+    font-size: 2.5em; /* Example: slightly larger for "Hello!" */
+    font-weight: bold;
+    color: var(--text-color-dark);
+    text-align: center;
+    /* transition for smooth fade out */
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+
+    /* Center the greeting within the chat-box */
+    position: absolute; /* Position it relative to the chat-box */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Adjust for perfect centering */
+    width: 100%; /* Occupy full width to center text */
+}
+
+/* Styles for paragraphs within the initial greeting */
+.initial-greeting-message p {
+    margin: 0; /* Remove default top/bottom margin from paragraphs */
+    padding: 0; /* Remove default padding */
+    line-height: 1.2; /* Adjust line height if needed for the first line */
+}
+
+/* Specific style for the second line */
+.initial-greeting-message .sub-greeting {
+    font-size: 0.6em; /* Relative to parent .initial-greeting-message's font-size (2.5em * 0.6 = 1.5em) */
+    font-weight: normal; /* Make it less bold than "Hello!" */
+    margin-top: 10px; /* Space between the two lines */
+}
+
+
+.initial-greeting-message.hidden {
+    opacity: 0;
+    /* Using pointer-events none to allow clicks through after fading */
+    pointer-events: none;
+}
+
+
 /* --- Message Styles --- */
 .message {
     display: flex; /* Use flexbox for avatar and content alignment */
@@ -150,43 +194,13 @@ body {
     line-height: 1.5;
     white-space: pre-wrap; /* Preserve whitespace and allow text wrapping */
     word-wrap: break-word; /* Break long words that don't fit */
+    position: relative; /* Allow messages to stack above the absolute positioned greeting */
+    z-index: 1; /* Ensure messages appear above the greeting when it's still present */
 }
 
 .message:last-of-type {
     margin-bottom: 20px; /* No margin below the very last message */
 }
-
-/* Initial message styling (e.g., "Hello, how can I help you today?") */
-.initial-message {
-    background-color: transparent;
-    box-shadow: none;
-    margin-top: 20px; /* Adjusted to reduce gap */
-    margin-bottom: 50px; /* Keep space below it for subsequent messages */
-    align-items: center; /* Override to center avatar with text for initial */
-    flex-direction: column;
-    text-align: center;
-    padding: 0; /* No padding on this container */
-    gap: 0; /* No gap */
-}
-.initial-message .avatar {
-    width: 64px;
-    height: 64px;
-    margin-bottom: 15px;
-}
-.initial-message .message-content {
-    background-color: transparent !important; /* Force transparent */
-    box-shadow: none !important; /* Force no shadow */
-    padding: 0 !important; /* No padding */
-    font-size: 1.2em;
-    font-weight: 500;
-    max-width: 600px; /* Ensure initial message text doesn't get too wide */
-    width: auto; /* Allow it to shrink to content */
-    border-radius: 0;
-}
-.initial-message p {
-    margin: 0;
-}
-
 
 /* Avatar common styles */
 .avatar {
