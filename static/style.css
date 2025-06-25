@@ -152,7 +152,7 @@ body {
 }
 
 .message:last-of-type {
-    margin-bottom: 0; /* No margin below the very last message */
+    margin-bottom: 20px; /* No margin below the very last message */
 }
 
 /* Initial message styling (e.g., "Hello, how can I help you today?") */
