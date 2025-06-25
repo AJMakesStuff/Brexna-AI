@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brexna AI | The Multi-Personaity AI Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="chat-container">
+        <header class="chat-header">
+            <h1>Brexna AI</h1>
+            <div class="personality-selector">
+                <label for="personality-select">Personality:</label>
+                <select id="personality-select">
+                    {# Loop through personalities passed from Flask #}
+                    {% for key, personality_data in personalities.items() %}
+                    <option value="{{ key }}" {% if key == 'brexna' %}selected{% endif %}>{{ personality_data.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </header>
+        <div id="chat-box" class="chat-box">
+            <div class="message bot-message">
+                <div class="avatar bot-avatar">AI</div>
+                <div class="message-content">Hello! How can I help you today?</div>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <div id="typing-indicator" class="typing-indicator">
+                <span></span><span></span><span></span>
+            </div>
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button id="send-button" title="Send message">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div> <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

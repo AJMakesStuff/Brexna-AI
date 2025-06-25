@@ -1,0 +1,389 @@
+/* Using CSS Variables for easy theme management */
+:root {
+    --bg-color: #202123; /* Main dark background */
+    --chat-bg-color: #343541; /* Slightly lighter dark for chat area */
+    --message-bg-dark: #444654; /* Background for AI messages (content bubble) */
+    --text-color-dark: #dcdcdc; /* Light text on dark background */
+    --border-color: #555;
+    --input-bg-color: #40414f; /* Input field background (and user message content bubble) */
+    --input-border-color: #5d5e69;
+    --send-button-bg: #10a37f; /* Green send button */
+    --send-button-hover: #0e8a6a;
+
+    /* Define common heights for easy calculation (desktop-only now) */
+    --header-height-desktop: 100px; /* Estimated header height on desktop */
+    --input-height-desktop: 100px; /* Estimated input area height on desktop */
+    /* Mobile-specific height variables removed */
+}
+
+/* --- Basic setup for full viewport --- */
+html, body {
+    height: 100%; /* Ensures html and body are full height */
+    margin: 0;
+    padding: 0;
+    min-height: 100vh; /* Ensure full viewport height fallback on desktop */
+    overflow: hidden; /* Prevent body itself from scrolling unnecessarily */
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    display: flex;
+    justify-content: center; /* Center horizontally on desktop */
+    align-items: center; /* Center vertically on desktop */
+    color: var(--text-color-dark);
+    line-height: 1.5;
+}
+
+.chat-container {
+    background-color: var(--chat-bg-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    width: 90%; /* Take 90% width */
+    max-width: 768px; /* Max width for the chat window */
+    height: 90vh; /* Take 90% viewport height */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Ensures content doesn't overflow rounded corners */
+}
+
+/* --- Chat Header Styles --- */
+.chat-header {
+    display: flex;
+    flex-direction: column; /* Stack title and personality selector vertically */
+    align-items: center; /* Center horizontally within the header */
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--message-bg-dark); /* Darker background for header */
+    /* Manage height directly as a flex item */
+    flex-shrink: 0; /* Prevent header from shrinking */
+    height: var(--header-height-desktop); /* Fixed height */
+    box-sizing: border-box; /* Include padding in width/height */
+    width: 100%; /* Ensure it spans full width */
+}
+
+.chat-header h1 {
+    margin: 0;
+    font-size: 1.2em;
+    color: var(--text-color-dark);
+}
+
+/* --- Personality Selector Styles --- */
+.personality-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between label and select */
+    margin-top: 10px; /* Space below title */
+    margin-bottom: 5px; /* Space above chat box */
+}
+
+.personality-selector label {
+    font-size: 0.9em;
+    color: var(--text-color-dark);
+    white-space: nowrap; /* Prevent label from wrapping */
+}
+
+#personality-select {
+    padding: 6px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--input-border-color);
+    background-color: var(--input-bg-color);
+    color: var(--text-color-dark);
+    font-size: 0.9em;
+    cursor: pointer;
+    outline: none; /* Remove outline on focus */
+    appearance: none; /* Remove default dropdown arrow */
+    -webkit-appearance: none; /* For Webkit browsers */
+    -moz-appearance: none; /* For Mozilla browsers */
+    /* Custom SVG for dropdown arrow (a simple down arrow) */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23dcdcdc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+    background-repeat: no-repeat;
+    background-position: right 8px center; /* Position the arrow */
+    background-size: 16px; /* Size of the arrow */
+    padding-right: 30px; /* Make space for custom arrow */
+}
+
+#personality-select:hover {
+    border-color: #6a6b7d; /* Highlight border on hover */
+}
+
+#personality-select option {
+    background-color: var(--input-bg-color); /* Background for options */
+    color: var(--text-color-dark);
+}
+
+/* --- Chat Box Styles --- */
+.chat-box {
+    flex-grow: 1; /* Allows chat box to take remaining vertical space */
+    padding: 20px; /* Padding inside the chat area */
+    overflow-y: auto; /* Enable vertical scrolling */
+    scroll-behavior: smooth; /* Smooth scrolling for new messages */
+    
+    /* REMOVED: padding-top and padding-bottom that were causing the gap */
+    /* padding-top: var(--header-height-desktop); */
+    /* padding-bottom: var(--input-height-desktop); */
+    box-sizing: border-box; /* Include padding in height calculation */
+
+    /* Custom scrollbar styles (for browsers that support it) */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: var(--border-color) var(--chat-bg-color); /* Firefox */
+}
+
+/* Custom scrollbar for Webkit browsers (Chrome, Safari, Edge) */
+.chat-box::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-box::-webkit-scrollbar-track {
+    background: var(--chat-bg-color);
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 10px;
+    border: 2px solid var(--chat-bg-color);
+}
+
+/* --- Message Styles --- */
+.message {
+    display: flex; /* Use flexbox for avatar and content alignment */
+    align-items: flex-start; /* Align avatar and text content to the top */
+    margin-bottom: 10px; /* Vertical space between message blocks */
+    gap: 15px; /* Horizontal space between avatar and message content bubble */
+    /* No background or padding on this wrapper, it's on .message-content */
+    line-height: 1.5;
+    white-space: pre-wrap; /* Preserve whitespace and allow text wrapping */
+    word-wrap: break-word; /* Break long words that don't fit */
+}
+
+.message:last-of-type {
+    margin-bottom: 0; /* No margin below the very last message */
+}
+
+/* Initial message styling (e.g., "Hello, how can I help you today?") */
+.initial-message {
+    background-color: transparent;
+    box-shadow: none;
+    /* REDUCED: margin-top from 50px to 20px, to reduce gap */
+    margin-top: 20px; /* Adjusted to reduce gap */
+    margin-bottom: 50px; /* Keep space below it for subsequent messages */
+    align-items: center; /* Override to center avatar with text for initial */
+    flex-direction: column;
+    text-align: center;
+    padding: 0; /* No padding on this container */
+    gap: 0; /* No gap */
+}
+.initial-message .avatar {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 15px;
+}
+.initial-message .message-content {
+    background-color: transparent !important; /* Force transparent */
+    box-shadow: none !important; /* Force no shadow */
+    padding: 0 !important; /* No padding */
+    font-size: 1.2em;
+    font-weight: 500;
+    max-width: 600px; /* Ensure initial message text doesn't get too wide */
+    width: auto; /* Allow it to shrink to content */
+    border-radius: 0;
+}
+.initial-message p {
+    margin: 0;
+}
+
+
+/* Avatar common styles */
+.avatar {
+    flex-shrink: 0; /* Prevent avatar from shrinking */
+    width: 32px;
+    height: 32px;
+    border-radius: 50%; /* Make avatar circular */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 0.9em;
+    color: white;
+    overflow: hidden; /* Hide anything outside the circle for images */
+}
+
+.bot-avatar {
+    background-color: #1a7f64; /* Specific background color for AI avatar */
+}
+
+.user-avatar {
+    background-color: #555; /* Default background for user avatar if no image */
+}
+
+/* Message Content (the actual bubble) common styles */
+.message-content {
+    max-width: 75%; /* Limit bubble width to 75% of chat box width */
+    width: fit-content; /* Make the bubble shrink to fit its content */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Subtle shadow for bubble depth */
+    line-height: 1.5;
+    white-space: pre-wrap; /* Preserve whitespace and allow text wrapping */
+    word-wrap: break-word; /* Break long words that don't fit */
+}
+
+/* User Message Specific Styles */
+.user-message {
+    justify-content: flex-end; /* Push user message block to the right */
+    margin-left: auto; /* Ensure user message block is pushed to the right */
+    background-color: transparent; /* Wrapper is transparent */
+    color: var(--text-color-dark);
+}
+
+.user-message .message-content {
+    background-color: var(--input-bg-color); /* Background for user's content bubble */
+    padding: 10px 15px; /* Padding inside the user's bubble */
+    border-radius: 15px; /* Rounded corners for the bubble */
+    border-bottom-right-radius: 2px; /* Pointy corner for user bubble */
+}
+
+/* AI (Bot) Message Specific Styles */
+.bot-message {
+    justify-content: flex-start; /* Push AI message block to the left */
+    margin-right: auto; /* Ensure AI message block is pushed to the left */
+    background-color: transparent; /* Wrapper is transparent */
+    color: var(--text-color-dark);
+}
+
+.bot-message .message-content {
+    background-color: var(--message-bg-dark); /* Background for AI's content bubble */
+    padding: 10px 15px; /* Padding inside the AI's bubble */
+    border-radius: 15px; /* Rounded corners for the bubble */
+    border-bottom-left-radius: 2px; /* Pointy corner for AI bubble */
+    border-top-right-radius: 15px; /* Ensure other side is rounded */
+    border-bottom-right-radius: 15px;
+}
+
+
+/* --- Input Container Styles --- */
+.input-container {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: var(--chat-bg-color); /* Background for the input area */
+    border-top: 1px solid var(--border-color); /* Separator line above input */
+    position: relative; /* Make input-container a positioning context for its children */
+    /* Set default height for input container */
+    flex-shrink: 0; /* Prevent input from shrinking */
+    height: var(--input-height-desktop); /* Fixed height */
+    box-sizing: border-box; /* Include padding in width/height */
+    width: 100%; /* Ensure it spans full width */
+}
+
+#user-input {
+    flex-grow: 1; /* Allows input field to take available space */
+    padding: 12px 18px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 22px; /* More rounded input field */
+    font-size: 1em;
+    background-color: var(--input-bg-color);
+    color: var(--text-color-dark);
+    margin-right: 10px; /* Space between input and send button */
+    outline: none; /* Remove default focus outline */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); /* Inner shadow for depth */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Smooth transitions */
+}
+
+#user-input::placeholder {
+    color: #888; /* Placeholder text color */
+}
+
+#user-input:focus {
+    border-color: #6a6b7d; /* Highlight border on focus */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(64, 65, 79, 0.5); /* Subtle glow on focus */
+}
+
+/* --- Send Button Styles --- */
+#send-button {
+    background-color: var(--send-button-bg);
+    color: white;
+    border: none;
+    border-radius: 50%; /* Make it round */
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2em; /* For SVG icon size */
+    transition: background-color 0.3s ease, transform 0.1s ease; /* Smooth transitions */
+    flex-shrink: 0; /* Prevent button from shrinking */
+}
+
+#send-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+#send-button:hover {
+    background-color: var(--send-button-hover); /* Darker on hover */
+}
+
+#send-button:active {
+    transform: scale(0.95); /* Slightly shrink on click */
+}
+
+/* --- Error Message Styles --- */
+.error-message {
+    background-color: #dc3545; /* Red background for errors */
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+/* --- Typing Indicator Styles --- */
+.typing-indicator {
+    /* Positioned absolutely within .input-container */
+    position: absolute;
+    bottom: calc(100% + 5px); /* 5px above the top edge of .input-container */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Fine-tune horizontal centering */
+    
+    visibility: hidden; /* Controlled by JS classes 'visible' */
+    opacity: 0;
+    transition: opacity 0.3s ease; /* Smooth fade in/out */
+
+    width: auto; /* Let content determine width */
+    min-width: 50px; /* Smallest it can be */
+    height: 30px; /* Fixed height for the dots */
+    
+    z-index: 10; /* Ensure it's above other input area elements */
+    
+    display: flex; /* Flexbox for dots */
+    justify-content: center;
+    align-items: center;
+}
+
+.typing-indicator.visible {
+    visibility: visible;
+    opacity: 1;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background-color: #aaa;
+    border-radius: 50%;
+    margin: 0 4px;
+    animation: bounce 1.4s infinite ease-in-out both; /* Dot bounce animation */
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0s; }
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+}
+
+/*
+    All @media queries and mobile-specific styles have been removed
+    to revert to a desktop-only layout.
+*/

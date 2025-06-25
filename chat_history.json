@@ -1,0 +1,30 @@
+{
+    "560c6ae5-6e31-4e86-bfc3-d92bc99bc8bc": {
+        "history": [],
+        "created_at": 1750644900,
+        "last_updated": 1750644900
+    },
+    "00c520e0-7214-493c-bd16-7e9410a607ed": {
+        "history": [],
+        "created_at": 1750644996,
+        "last_updated": 1750644996
+    },
+    "87e6b7c9-4319-4e68-aeef-1f4ebadbff39": {
+        "history": [
+            {
+                "role": "user",
+                "parts": [
+                    "Hi"
+                ]
+            },
+            {
+                "role": "model",
+                "parts": [
+                    "Hi there! How can I help you today?"
+                ]
+            }
+        ],
+        "created_at": 1750645004,
+        "last_updated": 1750645010
+    }
+}
