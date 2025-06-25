@@ -6,6 +6,7 @@
     --text-color-dark: #dcdcdc; /* Light text on dark background */
     --border-color: #555;
     --input-bg-color: #40414f; /* Input field background (and user message content bubble) */
+    --user-chat-bg: #65C466;
     --input-border-color: #5d5e69;
     --send-button-bg: #10a37f; /* Green send button */
     --send-button-hover: #0e8a6a;
@@ -229,7 +230,7 @@ body {
 }
 
 .user-message .message-content {
-    background-color: var(--input-bg-color); /* Background for user's content bubble */
+    background-color: var(--user-chat-bg); /* Background for user's content bubble */
     padding: 10px 15px; /* Padding inside the user's bubble */
     border-radius: 15px; /* Rounded corners for the bubble */
     border-bottom-right-radius: 2px; /* Pointy corner for user bubble */
