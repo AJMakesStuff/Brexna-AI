@@ -85,7 +85,7 @@ body {
 
 #personality-select {
     padding: 6px 10px;
-    border-radius: 5px;
+    border-radius: 5px; /* Make it round */
     border: 1px solid var(--input-border-color);
     background-color: var(--input-bg-color);
     color: var(--text-color-dark);
@@ -127,6 +127,7 @@ body {
 
     /* IMPORTANT: Remove centering from chat-box */
     display: block; /* Change back to default block display for stacking messages */
+    position: relative; /* Needed for absolute positioning of initial greeting */
 }
 
 /* Custom scrollbar for Webkit browsers (Chrome, Safari, Edge) */
@@ -271,18 +272,18 @@ body {
 /* --- Input Container Styles --- */
 .input-container {
     display: flex;
-    align-items: center;
+    align-items: flex-end; /* Align items to the bottom, useful for multi-line textarea */
     padding: 20px;
     background-color: var(--chat-bg-color); /* Background for the input area */
     border-top: 1px solid var(--border-color); /* Separator line above input */
     position: relative; /* Make input-container a positioning context for its children */
-    /* Set default height for input container */
-    flex-shrink: 0; /* Prevent input from shrinking */
-    height: var(--input-height-desktop); /* Fixed height */
+    /* Adjusted min-height for input container to accommodate textarea */
+    min-height: var(--input-height-desktop); /* Fixed height or min-height */
     box-sizing: border-box; /* Include padding in width/height */
     width: 100%; /* Ensure it spans full width */
 }
 
+/* Updated styles for the textarea */
 #user-input {
     flex-grow: 1; /* Allows input field to take available space */
     padding: 12px 18px;
@@ -294,7 +295,28 @@ body {
     margin-right: 10px; /* Space between input and send button */
     outline: none; /* Remove default focus outline */
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); /* Inner shadow for depth */
-    transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Smooth transitions */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, height 0.2s ease; /* Smooth transitions for height */
+
+    /* Textarea specific styles */
+    resize: none; /* Disable manual resizing by user */
+    min-height: 40px; /* Approximate height for one line */
+    max-height: 150px; /* Maximum height before scrolling appears */
+    overflow-y: auto; /* Enable vertical scrolling when max-height is reached */
+    line-height: 1.5em; /* Ensure consistent line height for calculation */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    white-space: pre-wrap; /* Preserve whitespace and wrap text */
+    word-wrap: break-word; /* Break long words */
+    height: auto; /* Ensure it starts with auto height and expands */
+
+    /* --- HIDE SCROLLBAR --- */
+    /* For Webkit browsers (Chrome, Safari, Edge) */
+    &::-webkit-scrollbar {
+        width: 0px; /* Hide scrollbar width */
+        background: transparent; /* Make scrollbar track transparent */
+    }
+
+    /* For Firefox */
+    scrollbar-width: none; /* Hide scrollbar (Firefox specific) */
 }
 
 #user-input::placeholder {

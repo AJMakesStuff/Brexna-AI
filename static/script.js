@@ -1,18 +1,29 @@
 document.addEventListener('DOMContentLoaded', function() {
     const chatBox = document.getElementById('chat-box');
-    const userInput = document.getElementById('user-input');
+    const userInput = document.getElementById('user-input'); // This is now a textarea
     const sendButton = document.getElementById('send-button');
     const typingIndicator = document.getElementById('typing-indicator');
     const personalitySelect = document.getElementById('personality-select');
-    const initialGreeting = document.getElementById('initial-greeting'); // Get the new greeting element
+    const initialGreeting = document.getElementById('initial-greeting');
 
     // Event listeners for sending messages
     sendButton.addEventListener('click', sendMessage);
+
+    // Modified keypress event for textarea
     userInput.addEventListener('keypress', function(event) {
+        // If Enter is pressed WITHOUT Shift key, send the message
         if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
+            event.preventDefault(); // Prevent default new line in textarea
             sendMessage();
         }
+    });
+
+    // Auto-resize textarea on input
+    userInput.addEventListener('input', function() {
+        this.style.height = 'auto'; // Reset height to recalculate
+        this.style.height = (this.scrollHeight) + 'px'; // Set height to scroll height
+        // Ensure chat box scrolls to bottom when textarea expands
+        chatBox.scrollTop = chatBox.scrollHeight;
     });
 
     // Function to add a new message bubble to the chat box
@@ -26,7 +37,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const contentDiv = document.createElement('div');
         contentDiv.classList.add('message-content');
-        contentDiv.textContent = content;
+        // Use innerHTML for potentially formatted content (e.g., if AI sends markdown)
+        // For now, keep textContent as AI only sends plain text, but good to note.
+        contentDiv.textContent = content; 
 
         if (type === 'user') {
             messageDiv.appendChild(contentDiv);
@@ -81,6 +94,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         addMessage('user', message);
         userInput.value = '';
+        // Reset textarea height after sending message
+        userInput.style.height = 'auto'; 
         chatBox.scrollTop = chatBox.scrollHeight;
 
         typingIndicator.classList.add('visible');
