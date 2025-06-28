@@ -1,32 +1,26 @@
 document.addEventListener('DOMContentLoaded', function() {
     const chatBox = document.getElementById('chat-box');
-    const userInput = document.getElementById('user-input'); // This is now a textarea
+    const userInput = document.getElementById('user-input');
     const sendButton = document.getElementById('send-button');
     const typingIndicator = document.getElementById('typing-indicator');
     const personalitySelect = document.getElementById('personality-select');
     const initialGreeting = document.getElementById('initial-greeting');
 
-    // Event listeners for sending messages
     sendButton.addEventListener('click', sendMessage);
 
-    // Modified keypress event for textarea
     userInput.addEventListener('keypress', function(event) {
-        // If Enter is pressed WITHOUT Shift key, send the message
         if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault(); // Prevent default new line in textarea
+            event.preventDefault();
             sendMessage();
         }
     });
 
-    // Auto-resize textarea on input
     userInput.addEventListener('input', function() {
-        this.style.height = 'auto'; // Reset height to recalculate
-        this.style.height = (this.scrollHeight) + 'px'; // Set height to scroll height
-        // Ensure chat box scrolls to bottom when textarea expands
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
         chatBox.scrollTop = chatBox.scrollHeight;
     });
 
-    // Function to add a new message bubble to the chat box
     function addMessage(type, content) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', `${type}-message`);
@@ -37,9 +31,55 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const contentDiv = document.createElement('div');
         contentDiv.classList.add('message-content');
-        // Use innerHTML for potentially formatted content (e.g., if AI sends markdown)
-        // For now, keep textContent as AI only sends plain text, but good to note.
-        contentDiv.textContent = content; 
+
+        if (type === 'bot') {
+            contentDiv.innerHTML = marked.parse(content);
+
+            // *** NEW LOGIC FOR COPY BUTTONS ***
+            // Use setTimeout to ensure DOM is updated and Prism has highlighted
+            setTimeout(() => {
+                Prism.highlightAllUnder(contentDiv); // Highlight only within this message
+
+                // Find all <pre> elements (which contain <code> for code blocks)
+                const codeBlocks = contentDiv.querySelectorAll('pre');
+
+                codeBlocks.forEach(preBlock => {
+                    const codeElement = preBlock.querySelector('code');
+                    if (codeElement) {
+                        const copyButton = document.createElement('button');
+                        copyButton.classList.add('copy-button');
+                        copyButton.textContent = 'Copy';
+                        copyButton.title = 'Copy code to clipboard';
+
+                        copyButton.addEventListener('click', () => {
+                            // Use textContent to get the plain code without HTML
+                            const codeToCopy = codeElement.textContent;
+                            navigator.clipboard.writeText(codeToCopy).then(() => {
+                                copyButton.textContent = 'Copied!';
+                                copyButton.classList.add('copied');
+                                setTimeout(() => {
+                                    copyButton.textContent = 'Copy';
+                                    copyButton.classList.remove('copied');
+                                }, 2000); // Reset text after 2 seconds
+                            }).catch(err => {
+                                console.error('Failed to copy code: ', err);
+                                copyButton.textContent = 'Error!';
+                                copyButton.classList.add('error');
+                                setTimeout(() => {
+                                    copyButton.textContent = 'Copy';
+                                    copyButton.classList.remove('error');
+                                }, 2000);
+                            });
+                        });
+                        preBlock.appendChild(copyButton); // Append button to the <pre> block
+                    }
+                });
+            }, 0);
+            // **********************************
+
+        } else {
+            contentDiv.textContent = content;
+        }
 
         if (type === 'user') {
             messageDiv.appendChild(contentDiv);
@@ -52,27 +92,18 @@ document.addEventListener('DOMContentLoaded', function() {
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    /**
-     * Hides the initial "Hello" greeting message.
-     */
     function removeInitialGreeting() {
         if (initialGreeting && !initialGreeting.classList.contains('hidden')) {
             initialGreeting.classList.add('hidden');
-            // Optional: Remove the element after transition to clean up DOM
             initialGreeting.addEventListener('transitionend', () => {
                 initialGreeting.remove();
             }, { once: true });
         }
     }
 
-    /**
-     * Converts text to speech using the Web Speech API.
-     * @param {string} text The text to be spoken.
-     */
     function speakMessage(text) {
         if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel(); // Stop any ongoing speech
-
+            window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.rate = 1.0;
             utterance.pitch = 1.0;
@@ -82,20 +113,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-
     async function sendMessage() {
         const message = userInput.value.trim();
         const selectedPersonality = personalitySelect.value;
 
         if (message === '') return;
 
-        // Hide the initial greeting message when the first user message is sent
         removeInitialGreeting();
 
         addMessage('user', message);
         userInput.value = '';
-        // Reset textarea height after sending message
-        userInput.style.height = 'auto'; 
+        userInput.style.height = 'auto';
         chatBox.scrollTop = chatBox.scrollHeight;
 
         typingIndicator.classList.add('visible');

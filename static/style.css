@@ -37,14 +37,22 @@ body {
 
 .chat-container {
     background-color: var(--chat-bg-color);
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    width: 90%; /* Take 90% width */
-    max-width: 768px; /* Max width for the chat window */
-    height: 90vh; /* Take 90% viewport height */
+    border-radius: 8px; /* Keep rounded corners on desktop */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Keep shadow on desktop */
+    width: 100vw; /* Take 100% viewport width */
+    max-width: 100vw; /* Ensure it doesn't exceed viewport width */
+    height: 100vh; /* Take 100% viewport height */
+    max-height: 100vh; /* Ensure it doesn't exceed viewport height */
     display: flex;
     flex-direction: column;
     overflow: hidden; /* Ensures content doesn't overflow rounded corners */
+    /* Remove explicit positioning if it's naturally filling the space */
+    position: relative; /* Make it a positioning context for any children that need it */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0; /* Remove any centering margins */
 }
 
 /* --- Chat Header Styles --- */
@@ -185,12 +193,11 @@ body {
     pointer-events: none;
 }
 
-
 /* --- Message Styles --- */
 .message {
     display: flex; /* Use flexbox for avatar and content alignment */
     align-items: flex-start; /* Align avatar and text content to the top */
-    margin-bottom: 10px; /* Vertical space between message blocks */
+    margin-bottom: 8px; /* **REDUCED** Vertical space between message blocks, was 10px */
     gap: 15px; /* Horizontal space between avatar and message content bubble */
     line-height: 1.5;
     white-space: pre-wrap; /* Preserve whitespace and allow text wrapping */
@@ -202,6 +209,19 @@ body {
 .message:last-of-type {
     margin-bottom: 20px; /* No margin below the very last message */
 }
+
+/* NEW: Styles for paragraphs within message content to reduce space */
+.message-content p {
+    margin: 0; /* Remove default margin on paragraphs */
+    padding: 0; /* Remove default padding on paragraphs */
+    /* Add a small bottom margin only if a paragraph is followed by another paragraph */
+    margin-bottom: 0.5em; /* Adjust this value as needed, 0.5em is half the line height */
+}
+
+.message-content p:last-child {
+    margin-bottom: 0; /* No bottom margin on the last paragraph in a message-content */
+}
+
 
 /* Avatar common styles */
 .avatar {
@@ -429,4 +449,120 @@ body {
         bottom: 0;
         margin-bottom: 60px; /* Apply margin-bottom only on mobile */
     }
+}
+
+.message-content pre {
+    background-color: #2d2d2d; /* Dark background for code blocks */
+    color: #f8f8f2; /* Light text for code */
+    padding: 10px 15px;
+    border-radius: 8px;
+    overflow-x: auto; /* Enable horizontal scrolling for long lines */
+    margin: 10px 0; /* Space above and below code block */
+    font-family: 'Fira Code', 'Cascadia Code', 'Consolas', 'Monaco', monospace; /* Monospaced font */
+    font-size: 0.9em;
+    line-height: 1.4;
+    white-space: pre-wrap; /* Ensure text wraps within code block */
+    word-break: break-all; /* Break long words if necessary */
+
+    position: relative; /* <--- IMPORTANT: Needed for absolute positioning of the copy button */
+    padding-top: 35px; /* <--- Add space for the button at the top */
+}
+
+/* Adjust padding for code inside pre if needed after adding top padding to pre */
+.message-content pre code {
+    display: block;
+    padding: 0; /* Remove default padding for code inside pre */
+    background: none;
+    color: inherit;
+}
+
+/* --- Copy Button Styling --- */
+.copy-button {
+    position: absolute;
+    top: 5px; /* Adjust as needed */
+    right: 5px; /* Adjust as needed */
+    background-color: #555869; /* A subtle dark background for the button */
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8em;
+    opacity: 0.7; /* Slightly transparent when not hovered */
+    transition: opacity 0.2s ease, background-color 0.2s ease, transform 0.1s ease;
+    z-index: 2; /* Ensure it's above the code */
+}
+
+.copy-button:hover {
+    opacity: 1; /* Fully opaque on hover */
+    background-color: #6a6e80; /* Slightly lighter on hover */
+}
+
+.copy-button:active {
+    transform: scale(0.95); /* Slight shrink on click */
+}
+
+/* Feedback styles for the button */
+.copy-button.copied {
+    background-color: #28a745; /* Green for success */
+    opacity: 1;
+}
+
+.copy-button.error {
+    background-color: #dc3545; /* Red for error */
+    opacity: 1;
+}
+
+/* Hide the button when the pre block is not hovered (optional, but nice) */
+.message-content pre .copy-button {
+    opacity: 0; /* Start hidden */
+}
+
+.message-content pre:hover .copy-button {
+    opacity: 0.7; /* Show on hover */
+}
+
+/* Ensure the button is always visible on touch devices (no hover state) */
+@media (pointer: coarse) {
+    .message-content pre .copy-button {
+        opacity: 1;
+    }
+}
+
+/* Target headings within message content to reduce their top/bottom margins */
+.message-content h1,
+.message-content h2,
+.message-content h3,
+.message-content h4,
+.message-content h5,
+.message-content h6 {
+    margin-top: 0em; /* Reduce top margin */
+    margin-bottom: -1em; /* Reduce bottom margin */
+    /* You can set these to 0 if you want no space at all,
+       but a small margin often improves readability. */
+}
+
+/* Target paragraph elements within message content */
+.message-content p {
+    margin-top: 0.5em;
+    margin-bottom: -1em;
+}
+
+/* Target list elements within message content to reduce their margins/padding */
+.message-content ul,
+.message-content ol {
+    margin-top: -1em; /* Reduce top margin for lists */
+    margin-bottom: -1em; /* Reduce bottom margin for lists */
+    padding-left: 2.5em; /* Adjust padding as needed, usually for bullet/number indentation */
+}
+
+/* Target list items themselves if needed, though usually not the primary cause of large gaps */
+.message-content li {
+    margin-bottom: -1em; /* Small margin between list items */
+}
+
+/* You might also need to ensure there's no extra padding on the .message-content itself that's too large */
+.message-content {
+    /* Keep your existing padding, but be aware it contributes to the overall spacing */
+    padding: 10px 15px; /* This is already defined, just a reminder */
 }
