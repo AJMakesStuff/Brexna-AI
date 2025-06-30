@@ -2,11 +2,59 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatBox = document.getElementById('chat-box');
     const userInput = document.getElementById('user-input');
     const sendButton = document.getElementById('send-button');
+    const micButton = document.getElementById('mic-button');
     const typingIndicator = document.getElementById('typing-indicator');
     const personalitySelect = document.getElementById('personality-select');
     const initialGreeting = document.getElementById('initial-greeting');
 
+    let recognition; // For Web Speech API
+
+    // Initialize Web Speech API if supported
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.continuous = false; // Only get one result per speech instance
+        recognition.interimResults = false; // Only return final results
+        recognition.lang = 'en-US'; // Set language
+
+        recognition.onstart = function() {
+            micButton.classList.add('listening');
+            micButton.title = 'Listening... Click to stop.';
+            console.log('Speech recognition started.');
+        };
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            userInput.value = transcript;
+            // Adjust textarea height after setting value
+            userInput.style.height = 'auto';
+            userInput.style.height = (userInput.scrollHeight) + 'px';
+            console.log('Speech recognized:', transcript);
+            // Optionally, automatically send the message after recognition
+            // sendMessage(); 
+        };
+
+        recognition.onerror = function(event) {
+            console.error('Speech recognition error:', event.error);
+            micButton.classList.remove('listening');
+            micButton.title = 'Speech input error.';
+            // Optionally, display an error message in the chat or to the user
+            // addMessage('bot', `Speech input error: ${event.error}`);
+        };
+
+        recognition.onend = function() {
+            micButton.classList.remove('listening');
+            micButton.title = 'Speak your message';
+            console.log('Speech recognition ended.');
+        };
+
+    } else {
+        console.warn('Web Speech API not supported in this browser.');
+        micButton.style.display = 'none'; // Hide microphone button if not supported
+    }
+
+
     sendButton.addEventListener('click', sendMessage);
+    micButton.addEventListener('click', toggleSpeechInput);
 
     userInput.addEventListener('keypress', function(event) {
         if (event.key === 'Enter' && !event.shiftKey) {
@@ -101,17 +149,29 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function speakMessage(text) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 1.0;
-            utterance.pitch = 1.0;
-            window.speechSynthesis.speak(utterance);
+    // Function to toggle speech input
+    function toggleSpeechInput() {
+        if (micButton.classList.contains('listening')) {
+            recognition.stop(); // Stop listening
         } else {
-            console.warn("Web Speech API is not supported in this browser.");
+            userInput.value = ''; // Clear previous input
+            // Removed: userInput.focus(); // No longer explicitly focus the input field
+            recognition.start(); // Start listening
         }
     }
+
+    // This function for text-to-speech is not directly used for the current request
+    // function speakMessage(text) {
+    //     if ('speechSynthesis' in window) {
+    //         window.speechSynthesis.cancel();
+    //         const utterance = new SpeechSynthesisUtterance(text);
+    //         utterance.rate = 1.0;
+    //         utterance.pitch = 1.0;
+    //         window.speechSynthesis.speak(utterance);
+    //     } else {
+    //         console.warn("Web Speech API is not supported in this browser.");
+    //     }
+    // }
 
     async function sendMessage() {
         const message = userInput.value.trim();
@@ -146,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (response.ok) {
                 addMessage('bot', data.response);
-                // speakMessage(data.response);
+                // speakMessage(data.response); // Uncomment if you want text-to-speech for AI responses
             } else {
                 console.error('Server error:', data.error);
                 addMessage('bot', `Error: ${data.error || 'Unknown server error.'}`);

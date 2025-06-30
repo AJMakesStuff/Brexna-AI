@@ -10,6 +10,9 @@
     --input-border-color: #5d5e69;
     --send-button-bg: #10a37f; /* Green send button */
     --send-button-hover: #0e8a6a;
+    --mic-button-bg: #007bff; /* Blue for mic button */
+    --mic-button-hover: #0056b3;
+    --mic-button-active: #28a745; /* Green when active */
 
     /* Define common heights for easy calculation (desktop-only now) */
     --header-height-desktop: 100px; /* Estimated header height on desktop */
@@ -378,6 +381,42 @@ body {
     transform: scale(0.95); /* Slightly shrink on click */
 }
 
+/* --- Microphone Button Styles --- */
+#mic-button {
+    background-color: var(--mic-button-bg);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    flex-shrink: 0;
+    margin-right: 10px; /* Space between mic and user input */
+}
+
+#mic-button.listening {
+    background-color: var(--mic-button-active); /* Green when actively listening */
+}
+
+#mic-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+#mic-button:hover {
+    background-color: var(--mic-button-hover);
+}
+
+#mic-button:active {
+    transform: scale(0.95);
+}
+
+
 /* --- Error Message Styles --- */
 .error-message {
     background-color: #dc3545; /* Red background for errors */
@@ -447,7 +486,7 @@ body {
         left: 0;
         right: 0;
         bottom: 0;
-        margin-bottom: 60px; /* Apply margin-bottom only on mobile */
+        /* Removed margin-bottom as it's not needed for a full-screen app */
     }
 }
 
