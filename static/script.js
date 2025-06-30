@@ -29,8 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
             userInput.style.height = 'auto';
             userInput.style.height = (userInput.scrollHeight) + 'px';
             console.log('Speech recognized:', transcript);
-            // Optionally, automatically send the message after recognition
-            // sendMessage(); 
+            // Automatically send the message after recognition
+            sendMessage();
         };
 
         recognition.onerror = function(event) {
@@ -155,23 +155,47 @@ document.addEventListener('DOMContentLoaded', function() {
             recognition.stop(); // Stop listening
         } else {
             userInput.value = ''; // Clear previous input
-            // Removed: userInput.focus(); // No longer explicitly focus the input field
             recognition.start(); // Start listening
         }
     }
 
-    // This function for text-to-speech is not directly used for the current request
-    // function speakMessage(text) {
-    //     if ('speechSynthesis' in window) {
-    //         window.speechSynthesis.cancel();
-    //         const utterance = new SpeechSynthesisUtterance(text);
-    //         utterance.rate = 1.0;
-    //         utterance.pitch = 1.0;
-    //         window.speechSynthesis.speak(utterance);
-    //     } else {
-    //         console.warn("Web Speech API is not supported in this browser.");
-    //     }
-    // }
+    function speakMessage(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            
+            // Clean the text for speech
+            let cleanedText = text;
+
+            // Remove common Markdown bullet points (*, -, +) at the start of a line
+            // and replace them with nothing or a space to avoid "Asterisk"
+            cleanedText = cleanedText.replace(/^(\*|\-|\+) /gm, ''); 
+            
+            // Remove bold/italic markers (e.g., **, __, *, _)
+            // This regex captures the text inside the markers ($2) and replaces the whole match with just the captured text
+            cleanedText = cleanedText.replace(/(\*\*|__|\*|_)([^\s].*?)\1/g, '$2');
+            
+            // Remove code block backticks (single or triple) and their content
+            cleanedText = cleanedText.replace(/```[\s\S]*?```/g, ''); // Remove multi-line code blocks
+            cleanedText = cleanedText.replace(/`([^`]+?)`/g, '$1'); // Remove inline code backticks, keep content
+
+            // Remove heading hashes (e.g., #, ##)
+            cleanedText = cleanedText.replace(/^(#+)\s*/gm, '');
+
+            // Replace multiple newlines with a single space or period for better flow
+            cleanedText = cleanedText.replace(/\n\n+/g, '. '); // Two or more newlines become period-space
+            cleanedText = cleanedText.replace(/\n/g, ' ');    // Single newlines become space
+
+            // Remove any extra spaces and trim leading/trailing whitespace
+            cleanedText = cleanedText.replace(/\s+/g, ' ').trim();
+
+            const utterance = new SpeechSynthesisUtterance(cleanedText);
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            console.warn("Web Speech API is not supported in this browser.");
+        }
+    }
 
     async function sendMessage() {
         const message = userInput.value.trim();
@@ -206,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (response.ok) {
                 addMessage('bot', data.response);
-                // speakMessage(data.response); // Uncomment if you want text-to-speech for AI responses
+                speakMessage(data.response); // Uncommented to enable text-to-speech for AI responses
             } else {
                 console.error('Server error:', data.error);
                 addMessage('bot', `Error: ${data.error || 'Unknown server error.'}`);
