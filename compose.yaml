@@ -1,0 +1,14 @@
+services:
+  brexna:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-pro}
+      MULTIPLE_PERSON_BOOL: ${MULTIPLE_PERSON_BOOL:-false}
+    volumes:
+      - chat-data:/app/data
+    restart: unless-stopped
+volumes:
+  chat-data:

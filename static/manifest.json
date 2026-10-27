@@ -1,0 +1,16 @@
+{
+  "name": "Brexna AI",
+  "short_name": "Brexna",
+  "description": "The Multi-Personality AI Chatbot",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#18191c",
+  "theme_color": "#18191c",
+  "icons": [
+    {
+      "src": "/static/favicon.ico",
+      "sizes": "1638x1638",
+      "type": "image/x-icon"
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#18191c">
+    {% if enable_multiple_personalities_str == 'true' %}
+    <title>Brexna AI | The Multi-Personality AI Chatbot</title>
+    {% else %}
+    <title>Brexna AI | Productivity AI Chatbot</title>
+    {% endif %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='20261014-dark-2') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon"
+        sizes="1638x1638" />
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+</head>
+
+<body>
+    <main class="chat-container">
+        <header class="chat-header">
+            <div class="brand"><span class="brand-mark" aria-hidden="true">b.</span><div><h1>Brexna<span> AI</span></h1><p>Your everyday thinking partner</p></div></div>
+            <div class="header-controls">
+                {% if enable_multiple_personalities_str == 'true' %}
+                <div id="current-personality-display" class="current-personality-label"></div>
+                <button id="change-personality-button" class="action-button">Change Personality</button>
+                {% else %}
+                <!-- <div id="current-personality-display" class="current-personality-label">Current: Brexna: Default</div> -->
+                <button id="toggle-speech-settings-button" class="action-button">Speech Settings</button>
+                {% endif %}
+            </div>
+        </header>
+        <div id="chat-box" class="chat-box" role="log" aria-label="Conversation" aria-live="polite">
+            <div id="initial-greeting" class="initial-greeting-message">
+                <span class="greeting-mark" aria-hidden="true">✳</span>
+                <p class="eyebrow">A LITTLE CLARITY STARTS HERE</p>
+                <h2>Make room for a good idea.</h2>
+                <p class="sub-greeting">A question, a rough draft, a fresh perspective.<br>Let’s work through it together.</p>
+                <div class="capabilities" aria-label="Things you can ask about"><span>Write &amp; refine</span><span>Explore ideas</span><span>Solve problems</span></div>
+            </div>
+        </div>
+
+        <footer class="composer-area">
+        <div class="input-container">
+            <div id="typing-indicator" class="typing-indicator">
+                <span></span><span></span><span></span>
+            </div>
+            <textarea id="user-input" placeholder="What’s on your mind?" aria-label="Your message" rows="1"></textarea>
+            <button id="mic-button" class="input-button" title="Speak your message">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+            </button>
+            <button id="stop-speaking-button" class="input-button" title="Stop AI speaking">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect>
+                </svg>
+            </button>
+            <button id="send-button" class="input-button" title="Send message">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+        <p class="composer-hint">Enter to send <span>·</span> Shift + Enter for a new line</p>
+        </footer>
+    </main>
+
+    <div id="personality-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="personality-title">
+        <div class="modal-content">
+            <button type="button" class="modal-close-button" aria-label="Close personality settings">&times;</button>
+            <h2 id="personality-title">Make it your own</h2><p class="modal-description">Choose a personality and voice for your next conversation.</p>
+            <div class="personality-options-container">
+                {% if enable_multiple_personalities_str == 'true' %}
+                <div class="personality-selector">
+                    <label for="modal-personality-select">Choose Personality:</label>
+                    <select id="modal-personality-select">
+                        {# Loop through personalities passed from Flask #}
+                        {% for key, personality_data in personalities.items() %}
+                        <option value="{{ key }}" {% if key=='brexna' %}selected{% endif %}>{{ personality_data.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% else %}
+                <p>Personality selection is disabled. Only "Brexna: Default" is available.</p>
+                {% endif %}
+                {% if enable_multiple_personalities_str == 'true' %}
+                <!-- <div class="spoken-responses-toggle">
+                    <input type="checkbox" id="enable-speech-output">
+                    <label for="enable-speech-output">Enable Spoken Responses</label>
+                </div> -->
+                <div class="voice-selector">
+                    <label for="modal-voice-select">Choose Voice:</label>
+                    <select id="modal-voice-select"></select>
+                </div>
+                {% endif %}
+            </div>
+            <button id="save-personality-button" class="action-button">Save Selection</button>
+        </div>
+    </div>
+
+    <div id="speech-settings-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="speech-title">
+        <div class="modal-content">
+            <button type="button" class="modal-close-button" id="speech-modal-close-button" aria-label="Close speech settings">&times;</button>
+            <h2 id="speech-title">Find your voice</h2><p class="modal-description">Choose how Brexna sounds when replying to voice messages.</p>
+            <div class="speech-options-container">
+                <!-- <div class="spoken-responses-toggle">
+                    <input type="checkbox" id="enable-speech-output-standalone">
+                    <label for="enable-speech-output-standalone">Enable Spoken Responses</label>
+                </div> -->
+                <div class="voice-selector">
+                    <label for="modal-voice-select-standalone">Choose Voice:</label>
+                    <select id="modal-voice-select-standalone"></select>
+                </div>
+            </div>
+            <button id="save-speech-settings-button" class="action-button">Save Settings</button>
+        </div>
+    </div>
+
+    <div id="chat-config" hidden
+         data-personalities='{{ personalities | tojson }}'
+         data-multiple-personalities="{{ enable_multiple_personalities_str }}"></div>
+    <script src="{{ url_for('static', filename='script.js', v='20261014-ui-1') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+</body>
+
+</html>

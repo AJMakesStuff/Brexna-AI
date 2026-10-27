@@ -1,0 +1,43 @@
+# Changelog
+# All notable changes to this project will be documented in this file.
+# The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
+# and this project adheres to Semantic Versioning (https://semver.org/spec/v2.0.0.html).
+
+1.0.4.1:
+  date: "04-07-2025"
+  changed:
+    - "Made changes to gui_controller.py"
+
+1.0.4:
+  date: "04-07-2025"
+  added:
+    - "Continuous voice conversation mode"
+  changed:
+    - "AI now speaks only if user input is via speech-to-text"
+    - "Removed 'Enable Spoken Responses' checkbox from UI"
+
+1.0.3:
+  date: "04-07-2025"
+  changed:
+    - "Updated the legacy backend endpoint"
+
+1.0.2:
+  date: "03-07-2025"
+  changed:
+    - "Reduced word-spacing for #user-input field"
+
+1.0.1:
+  date: "03-07-2025"
+  fixed:
+    - "Updated changelog.yaml filename"
+
+1.0.0:
+  date: "03-07-2025"
+  added:
+    - "Initial release of the application"
+    - "Basic AI functionality"
+  changed:
+    - "UI overhaul"
+  fixed:
+    - "Messages not sending"
+    - "Voices not populating on mobile"
