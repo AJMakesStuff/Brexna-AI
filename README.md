@@ -1,7 +1,3 @@
-# Disclaimer
-
-API key used in old commits is not active, do not try it, it will fail
-
 # Brexna
 
 A standalone Flask chat website that calls Gemini directly. Includes selectable personalities, Markdown and code highlighting, microphone input, voice selection, and spoken replies to voice messages. Browser speech support varies; microphone access requires localhost or HTTPS.
